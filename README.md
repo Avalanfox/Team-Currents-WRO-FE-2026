@@ -325,15 +325,44 @@ This testing helped confirm that reducing the available drivetrain torque was ac
 
 # 7. Power and Electronics
 
-## Power Distribution
+## Power Architecture
 
-| Rail | Source | Used For |
+The robot uses a 3S 2200 mAh LiPo battery as its main energy source.
+
+The battery provides:
+
+- Nominal voltage: 11.1 V
+- Fully charged voltage: 12.6 V
+- Capacity: 2200 mAh
+- Nominal stored energy: approximately 24.4 Wh
+
+The battery is not connected directly to the Raspberry Pi or servo. The system uses regulated power rails to provide the appropriate voltage for each subsystem.
+
+### Power Distribution
+
+| Power Rail | Source | Main Loads |
 |---|---|---|
-| **Raw battery voltage** | 3S LiPo | Motor driver and buck converters |
-| **+5 V** | Buck converter | Servo and electronics |
-| **+3.3 V** | Raspberry Pi 5 | OLED and IMU |
-| **GND** | Battery negative | Common ground |
+| 11.1–12.6 V raw battery | 3S LiPo | TB6612FNG motor supply |
+| +5 V regulated | Buck converter | Servo and other 5 V electronics |
+| +5 V regulated | USB buck converter | Raspberry Pi 5 |
+| +3.3 V | Raspberry Pi | OLED and IMU |
+| GND | Battery negative | Common reference |
 
+The 3S battery voltage varies from approximately 12.6 V when fully charged to a lower voltage during operation. The regulated converters prevent this variation from being directly applied to the Raspberry Pi and other low-voltage electronics.
+
+The Raspberry Pi is therefore isolated from the raw motor supply and receives a regulated 5 V supply.
+
+## Power Design Reasoning
+
+The power architecture was designed to separate the high-current motor path from the sensitive computing and sensing electronics.
+
+The motor driver receives power from the raw battery rail, while the Raspberry Pi and servo are powered through regulated 5 V supplies.
+
+This separation was important because the motor and servo can produce current spikes during acceleration, turning and mechanical loading. Supplying the Raspberry Pi through a regulated converter reduces the effect of these changes on the computer's supply voltage.
+
+During development, the team experienced a problem with the original USB buck converter. The Raspberry Pi was not receiving sufficient current under load, so the converter was replaced with a higher-capability supply.
+
+This failure led us to treat the Raspberry Pi power supply as a critical part of the robot's reliability rather than simply as another electrical connection.
 ## Raspberry Pi 5 Pin Connections
 
 | Pi Pin | GPIO | Function | Connected To |
@@ -366,6 +395,47 @@ This testing helped confirm that reducing the available drivetrain torque was ac
 | `nSTBY` | GPIO6 / +5 V | Driver enable |
 
 The two channels of the TB6612FNG are connected in parallel to provide enough current for the drive motor.
+
+## Current and Power Capability
+
+The main components were selected with their voltage and current requirements in mind.
+
+| Component | Supply | Relevant current/power consideration |
+|---|---|---|
+| Raspberry Pi 5 | 5 V regulated | Requires a high-current 5 V supply |
+| TB6612FNG | Motor supply from battery | 1.2 A average / 3.2 A peak output capability |
+| Steering servo | 5 V regulated | High current can occur during mechanical loading |
+| Camera | Raspberry Pi | Powered by the Raspberry Pi |
+| OLED | 3.3 V | Low-current I2C peripheral |
+| IMU | 3.3 V | Low-current I2C peripheral |
+| LEDs | GPIO-controlled | Status indication |
+
+The motor driver and servo are treated as the main high-current loads, while the Raspberry Pi, IMU and OLED are treated as sensitive electronic loads.
+
+The final design therefore avoids powering the motor directly from the Raspberry Pi and avoids using the Raspberry Pi GPIO pins as a power source for the servo.
+
+## Power Testing
+
+The power system was tested on the physical robot to check the battery-side electrical load during different operating conditions.
+
+| Operating Condition | Battery Voltage | Battery Current | Approx. Power |
+|---|---:|---:|---:|
+| Robot idle | TBD | TBD | TBD |
+| Normal driving | TBD | TBD | TBD |
+| Turning / servo movement | TBD | TBD | TBD |
+
+These measurements will be used to compare the actual robot power demand with the capabilities of the battery, buck converters and motor driver.
+
+## Engineering Decision Summary
+
+| Problem | Initial Approach | Problem Found | Final Approach | Validation |
+|---|---|---|---|---|
+| Drivetrain | Higher torque configuration | Torque was more than required | Speed-oriented gearing | 3 m speed test |
+| Wall following | Two-wall centre | Failed when one wall disappeared | Single-wall following | Physical testing |
+| Obstacle avoidance | Fixed colour-based turn | Failed near corner obstacles | Centre obstacle before avoidance | Physical testing |
+| Servo | Unrestricted movement | Servo overturned | Software steering limits | Physical testing |
+| Power | 5 V / 3 A USB buck converter | Raspberry Pi power was insufficient | Higher-capability converter | Hardware testing |
+| Camera | Initial position and angle | Unstable wall/obstacle detection | Tested rear camera position | Physical testing |
 
 ## Sensors and Peripherals
 
@@ -440,6 +510,43 @@ The masks are then processed using morphological operations before contours are 
 
 ---
 
+## Software Setup and Reproduction
+
+The robot software runs on Raspberry Pi OS using Python.
+
+### Required Hardware
+
+- Raspberry Pi 5 (4 GB)
+- Raspberry Pi Camera
+- IMU
+- TB6612FNG motor driver
+- Steering servo
+- Drive motor
+
+### Software Setup
+
+1. Install Raspberry Pi OS 64-bit.
+2. Enable the I2C interface for the IMU and OLED.
+3. Connect the Raspberry Pi Camera.
+4. Install the Python libraries required by the programs in `src/`.
+5. Place the robot source files in the `src/` directory.
+6. Connect the electronics according to the circuit schematic in `schemes/schematic.png`.
+7. Run the appropriate challenge program from the `src/` directory.
+
+### Running the Programs
+
+For the Open Challenge:
+
+```bash
+python3 src/open_challenge.py
+
+### Main Programs
+
+- `src/open_challenge.py` — Open Challenge
+- `src/obstacle_challenge.py` — Obstacle Challenge
+
+The camera, IMU, motor driver and servo must be connected according to the GPIO mapping documented in the Power and Electronics section.
+
 # 9. Open Challenge
 
 ## Initial Navigation
@@ -471,6 +578,17 @@ The robot follows the **right wall**.
 The robot follows the **left wall**.
 
 This was more reliable because the robot no longer needed both walls to be detected at the same time.
+
+## Wall-Following Testing
+
+The two navigation approaches were compared during physical testing.
+
+| Approach | Main Result |
+|---|---|
+| Two-wall centre following | Unstable when one wall was not detected |
+| Direction-based single-wall following | More reliable when one wall was temporarily unavailable |
+
+The final approach was selected after repeated physical testing because it reduced the effect of losing one wall from the camera view.
 
 ## Meander Turns
 
@@ -600,9 +718,9 @@ A lot of the development involved dealing with hardware failures and unexpected 
 
 ## Battery Failure
 
-The battery exploded while it was being charged.
+During development, one LiPo battery was damaged during charging.
 
-This was one of the major hardware failures during development and made us more careful about LiPo charging and handling.
+This was a major hardware safety failure and made the team more careful about LiPo charging, battery condition and handling.
 
 ## USB Buck Converter
 
@@ -658,21 +776,33 @@ The aim is to make the final parking position consistent rather than relying onl
 
 # 14. Repository Structure
 
-The repository is organised into the robot's source code, photographs and CAD models.
+The repository is organised so that the robot design, software, electronics documentation and testing evidence can be reviewed separately.
 
-- `src/` — Robot software
-- `v-photos/` — Robot photographs and videos
-- `models/` — 3D models of the custom parts
+| Folder | Contents |
+|---|---|
+| `src/` | Robot control and challenge software |
+| `models/` | 3D CAD models of custom robot parts |
+| `schemes/` | Circuit schematic and electronics documentation |
+| `v-photos/` | Robot photographs and hardware documentation |
+| `video/` | Robot testing and demonstration videos |
+| `other/` | Additional supporting documentation and files |
 
-The `models/` folder contains:
+### Main Software
 
-- `chassis`
-- `circuit_box`
-- `circuit_box_lid`
-- `camera_mount`
-- `camera_case`
+- `src/open_challenge.py`
+- `src/obstacle_challenge.py`
 
----
+### Main CAD Models
+
+- `models/chassis`
+- `models/circuit_box`
+- `models/circuit_box_lid`
+- `models/camera_mount`
+- `models/camera_case`
+
+### Electronics Documentation
+
+- `schemes/schematic.png`
 
 ## Conclusion
 
