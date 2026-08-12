@@ -537,8 +537,11 @@ The robot software runs on Raspberry Pi OS using Python.
 
 For the Open Challenge:
 
-```bash
-python3 src/open_challenge.py
+    python3 src/open_challenge.py
+
+For the Obstacle Challenge:
+
+    python3 src/obstacle_challenge.py
 
 ### Main Programs
 
