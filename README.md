@@ -340,6 +340,12 @@ This photo shows the electronics and wiring from the top of the robot.
 
 <img src="v-photos/circuit_from_top.png" alt="Circuit From Top" width="700">
 
+## Circuit Schematic
+
+The complete circuit schematic showing the Raspberry Pi, motor driver, power system, sensors and other electronics is shown below.
+
+<img src="schemes/schematic.png" alt="Circuit Schematic" width="1000">
+
 # 8. Software Architecture
 
 The software runs on the Raspberry Pi 5 using Python.
