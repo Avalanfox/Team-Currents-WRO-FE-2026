@@ -1,175 +1,637 @@
-# WRO Future Engineers 2026 — Team Currents
+# The Dark Knight
 
-## The Team
+### WRO Future Engineers 2026 — Engineering Documentation
 
-- **Darsh Makadia** — Adani International School
-- **Ehan Mansuri** - Udgam School For Children
-- **Coach:** Sunil Solanki
+**Team:** Currents
 
 ---
 
-## Robot Overview
+## Table of Contents
 
-An autonomous robot using cameras for WRO 2026 Future Engineers. The robot uses a Raspberry Pi 5 as its sole computer which deals with the camera input, color recognition, distance calculation from walls, motor movement, and servos for turning, all within a single Python loop.
+1. [Team](#1-team)
+2. [Robot Overview](#2-robot-overview)
+3. [Robot Specifications](#3-robot-specifications)
+4. [Components](#4-components)
+5. [3D Modelling and Mechanical Design](#5-3d-modelling-and-mechanical-design)
+6. [Mobility Management](#6-mobility-management)
+7. [Power and Electronics](#7-power-and-electronics)
+8. [Software Architecture](#8-software-architecture)
+9. [Open Challenge](#9-open-challenge)
+10. [Obstacle Challenge](#10-obstacle-challenge)
+11. [Camera Placement](#11-camera-placement)
+12. [Failure Cases](#12-failure-cases)
+13. [Future Enhancements](#13-future-enhancements)
+14. [Repository Structure](#14-repository-structure)
 
-| View 1 (Robot from Top: Shows Differential) | View 2 (Robot from side with Servo Mount) |
+---
+
+# 1. Team
+
+| Name | Role |
 |---|---|
-| ![Robot from Top: Shows Differential](./images/robot1.jpg) | ![Robot side with Servo Mount](./images/robot2.jpg) |
+| **Darsh Makadia** | Programming & Electronics |
+| **Ehan Mansuri** | Mechanical Design & 3D Modelling |
+| **Sunil Solanki** | Coach |
+
+**Robot:** The Dark Knight  
+**Team:** Currents  
+**Competition:** WRO Future Engineers 2026
 
 ---
 
-## Mobility Management
+# 2. Robot Overview
 
-**Drive:** Single Lego EV3 Medium Motor (rear-wheel drive)  
-**Steering:** DS3225 servo (25kg/cm) for parallel steering  
-**Chassis:** Lego Technic beams  
+The Dark Knight is a four-wheeled autonomous robot built for the WRO Future Engineers category.
 
-### Motor choice
+The main computer is a **Raspberry Pi 5 (4 GB)**. A Raspberry Pi Camera is used for detecting the track walls, colours and obstacles. A servo controls the front steering mechanism, while a geared DC motor drives the rear axle.
 
-Currently, we have only one EV3 Medium Motor connected to the rear axle. You can see the mechanical differential that is mounted on the chassis in our photos; however, this mechanism is already constructed with the intention to be connected to a second EV3 motor when required for improved traction or maneuverability, in case the single-motor operation is not enough.
+The robot uses a LEGO Technic drivetrain with a differential. The chassis and several other parts were designed in CAD and 3D printed in PLA.
 
-### Why a mechanical differential at all
+During development, we changed both the mechanical design and the software several times. Most of these changes came from problems we found while testing the robot on the actual track, especially with wall detection, camera placement, obstacle detection and steering.
 
-Even with one motor, routing power through the differential instead of a fixed axle lets the outer rear wheel spin faster than the inner wheel during a turn. Without this, a fixed axle forces both wheels to rotate at the same speed in a corner, which causes one wheel to scrub against the floor and creates unpredictable turning behaviour. The differential removes that problem and also makes adding a second motor later a simple mechanical change with no rewiring needed.
+## Robot Photos
 
-### The rule conflict we had to solve
+All robot photographs are stored in [`v-photos/`](v-photos/).
 
-Reading the rulebook carefully, rule 11.3 says the vehicle must have "one driving axle" but also allows four-wheel drive which was a contradiction. Rule 11.13 adds that two driving motors cannot be connected independently of each other.
+### Front View
 
-Our proposed solution should we use the second motor: connect both motors to the **same output channel** of the TB6612FNG, so that they will be supplied with the same PWM signal, and won’t be controlled independently from each other. Then the differential will take care of the distribution of the power between the wheels mechanically. Thus, rules 11.13 and 11.3 are fulfilled.
+<img src="v-photos/front_view.png" alt="Front View" width="600">
 
-### Steering
+### Back View
 
-We looked into Ackermann steering, where the inner wheel steers at a greater angle compared to the outer wheel when the vehicle takes a corner, which is an ideal design used by actual cars that have reduced scrub and consistency of turning radius. With the help of the coach, we began with a parallel steering system (steering angles of both front wheels being equal) as an attempt for our complete functioning robot.
+<img src="v-photos/back_view.png" alt="Back View" width="600">
 
-![Chassis top — differential visible](./images/robot1.jpg)
-*Rear differential assembly*
+### Side Views
 
----
+<p align="center">
+  <img src="v-photos/side_view_1.png" alt="Side View 1" width="45%">
+  <img src="v-photos/side_view_2.png" alt="Side View 2" width="45%">
+</p>
 
-## Power & Sense Management
+### Motor and Steering
 
-**Compute:** Raspberry Pi 5 (4GB)  
-**Camera:** Pi Camera Module 3 Wide  
-**Motor driver:** TB6612FNG breakout
+<p align="center">
+  <img src="v-photos/motor_close_up.png" alt="Motor Close Up" width="45%">
+  <img src="v-photos/servo_close_up.png" alt="Servo Close Up" width="45%">
+</p>
 
-### Why camera and not LiDAR
+### Differential and Electronics
 
-We purchased a RPLidar C1 (360° laser scanner) and initially planned to use it for wall detection since it gives direct distance readings in every direction. We decided against it for two reasons:
-
-1. A full 360° point cloud every scan is significant CPU load on top of camera processing, motor control, and servo control which all run in the same Pi loop. We were not confident the loop would stay fast enough under that combined load.
-2. The Pi Camera Module 3 Wide covers everything we actually need: estimating wall distance left and right, reading the orange and blue lane lines, and detecting red and green pillars for the obstacle challenge. There was no sensing task that genuinely required LiDAR.
-
-The RPLidar is not used this year. The catch is that camera-based distance estimation is indirect and angle-dependent. We solved this with the scan-row method described below.
-
-
-### Electrical Power Distribution
-
-| Component / Subsystem | Primary Power Source | Input Rail / Pins |
-| :--- | :--- | :---: |
-| **Raspberry Pi 5** | Battery via USB Converter | `- input` / `+ input` |
-| **TB6612FNG (Motor Power)** | Battery (Raw) | `VM` / `GND` | 
-| **DC Motor** | TB6612FNG Motor Driver | `A01` / `A02` |
-| **DS3225 Steering Servo** | Buck Converter | `+5V` / `GND` | 
-| **White LED Array** | Buck Converter | `+5V` / `GND` |
-| **Push Button** | Buck Converter | `+5V` / `GND` |
-| **TB6612FNG (Logic)** | Buck Converter | `STBY` |
-
-Isolating the Pi from the motor rail means motor current spikes and PWM switching noise don't affect the Pi's supply voltage. A brownout mid-run would reset the program and lose all states and variable values.
-
-### Circuit schematic
-
-![Schematic](./images/schematic.png)
-
-Designed in EasyEDA. The first version had long wires crossing the entire sheet and was hard to read or verify. We rebuilt it using **net labels** which are short named stubs on each component pin, with matching names on the destination pin so components sit cleanly in labelled boxes with no long wires. The layout now mirrors how professional schematics are structured, which also makes the ERC checker more useful since every unconnected pin is immediately obvious.
-
-### GPIO pin map
-
-| Pi Physical Pin | GPIO Pin | Net Label | Destination / Component |
-| :---: | :---: | :---: | :--- |
-| **10** | GPIO15 | `D15` | Push Button (Input) |
-| **12** | GPIO18 | `ENA` | TB6612FNG `PWMA` (Motor PWM Speed) |
-| **16** | GPIO23 | `IN2` | TB6612FNG `AIN2` (Motor Direction) |
-| **18** | GPIO24 | `IN1` | TB6612FNG `AIN1` (Motor Direction) |
-| **22** | GPIO25 | `D25` | DS3225 Servo (PWM Steering Signal) |
-| **25,39**| *GND* | `GND` | Common System Ground |
+<p align="center">
+  <img src="v-photos/differential.png" alt="Differential" width="45%">
+  <img src="v-photos/circuit_case_and_battery.png" alt="Differential and Battery" width="45%">
+</p>
 
 ---
 
-## Obstacle Management
+# 3. Robot Specifications
 
-### Open Challenge algorithm
+| Specification | Value |
+|---|---:|
+| **Length** | 23 cm |
+| **Width** | 13 cm |
+| **Height** | 27 cm |
+| **Mass** | 863 g |
+| **Weight distribution** | Approximately centred |
+| **Wheel diameter** | 43.2 mm |
+| **Drive gear ratio** | 1.8 : 1 |
 
-The robot runs as a three-state machine: `DETERMINE_DIRECTION → RACE → STOP`
+The weight distribution is approximately centred. This helped keep the robot stable during turns and while carrying the camera and electronics.
 
-**DETERMINE_DIRECTION**  
-The robot moves slowly while scanning for orange or blue on the floor. The current implementation locks direction on the first frame a blob is detected. A known improvement of requiring several consecutive frames of the same color before locking is planned to prevent a single noisy frame (glare, shadow) from committing the wrong direction for the entire run.
+## Motor and Torque
 
-**RACE**  
-Every camera frame the robot:
-1. Scans a single horizontal row near the bottom of the frame, outward from centre, to find where the black wall starts on each side
-2. Calculates `error = left_distance - right_distance` and applies a proportional steering correction
-3. Slows down proportionally to how sharp the correction is —> so small drifts get small adjustments, not sudden wheel yanks
-4. If neither side wall is found near centre (only the front wall fills the frame) —> corner detected —> applies a fixed turn in the locked direction
-5. Counts orange lines crossed with debounce at 12 lines (3 laps × 4 straights), moves to STOP
+Torque was important because we needed the robot to be fast enough for the Open Challenge while still having enough torque for slower movements and parking.
 
-**STOP**  
-Creep forward briefly to clear the finish line, then stop.
+### Motor
 
-### Why a scan-row for wall distance, not total wall area
+- **Stall torque:** 0.60 kg
+- **Gear ratio:** 1.8 : 1
 
-An earlier design compared total black pixel area in the left vs right half of the frame. This had a consistent problem: a wall nearly parallel to the camera direction fills many pixels even when it is not actually close (wide viewing angle = large area, even at distance). This made the robot steer incorrectly approaching corners.
+### Drive Output
 
-The scan-row method of scanning one horizontal row and finding where black starts from the centre outward avoids this. It measures how much floor is visible between the centre and the wall edge, which is a more direct proxy for actual distance and is not affected by viewing angle in the same way.
+- **Stall torque:** 0.97 kg
+- **Rated torque:** 0.24 kg
 
-### Color detection design
-
-Color detection is written as **separate functions per color** like `get_green_mask()`, `get_red_mask()`, `get_orange_mask()`, `get_blue_mask()` instead of one combined function.
-
-Reasons:
-- Each color's HSV range is tuned and tested independently without touching anything else
-- The open challenge only calls orange and blue and so no unnecessary computation on red/green present in every frame
-- The obstacle challenge will only call red and green which is the same benefit in reverse
-- When one color behaves unexpectedly under venue lighting, it is immediately obvious which function to fix
-- Red detection specifically needs two HSV ranges (red wraps around hue 0 in HSV). Keeping it in its own function makes this logic self-contained and easier to follow
-
-HSV ranges are set from the official WRO 2026 rulebook color specifications (section 13) with wide bounds, since real venue lighting rarely matches the spec. A white LED mounted next to the camera provides a consistent near-field light source so color temperature seen by the camera stays stable between practice and competition.
+The 1.8:1 gear ratio gives us more torque at the drive while reducing the output speed. This was useful for reaching the **25-second Open Challenge goal** while still having enough torque for low-speed movement.
 
 ---
 
-## What We Tried and Changed
+# 4. Components
 
-**Schematic v1:** Long wires connecting every component across the full sheet which was hard to trace, hard to verify, hard to check with ERC. Rebuilt using net labels after studying how top WRO teams' schematics were structured.
+## Electronics and Electromechanical Components
 
-**Direction detection:** Current code locks on the first frame a color blob is detected. Identified as a risk (one glare frame = wrong direction for the whole run). Debounce fix is planned which will require N consecutive frames of the same color before committing.
-
-**Area-based wall detection:** Compared total black pixel area left vs. right. Caused incorrect steering near corners due to angle-dependent area. Replaced with single scan-row edge detection.
-
-**Variable `area` bug in `get_largest_blob_coords`:** Current v1 code references `area` before calculating it, which causes a crash at runtime. We need to add `area = cv2.contourArea(largest_contour)` before the comparison. This will be corrected in v2.
-
-**Duplicate imports in `open_challenge_v1.py`:** Imports are written twice at the top with slightly different module names. Will be cleaned up in v2.
-
----
-
-## Code
-
-| File | Purpose |
+| Component | Use |
 |---|---|
-| `src/color_detection_v1.py` | HSV color ranges, individual mask functions per color, largest blob coordinate extraction |
-| `src/open_challenge_v1.py` | Camera loop, direction detection, wall scan, steering, speed control, corner detection, line counting |
+| **Raspberry Pi 5 (4 GB)** | Main computer and control unit |
+| **Raspberry Pi Camera Module** | Camera input |
+| **TB6612FNG Dual Motor Driver** | Controls the drive motor |
+| **JGB37-520 DC Motor (12 V, 600 RPM)** | Drive motor |
+| **Johnson Gear Motor (1000 RPM)** | Used during an earlier prototype |
+| **High-Torque Digital Servo** | Front steering |
+| **3S LiPo Battery, 2200 mAh** | Main power source |
+| **5 V Buck Converter** | Regulated power |
+| **USB Buck Converter** | Secondary 5 V supply |
+| **OLED Display** | Status display |
+| **IMU** | Orientation sensing |
+| **RGB LED** | Status indication |
+| **Programmable LED** | Digital status output |
+| **Push Button** | Start/user input |
+| **PLA Filament** | 3D-printed parts |
 
-> v1 is the first working draft. Known bugs and planned improvements are documented above. v2 will address all flagged items found and improve algorithm.
+## LEGO Technic Components
+
+The drivetrain and steering mechanism use:
+
+- 2×4 L Beam
+- 3×3 T Shape
+- 13×1 Beam
+- Bush
+- ½ Bush
+- 2L Axle Connector
+- Toggle Double with Axles & Pins
+- 3×3 L-Shaped Connector with 4 Pins
+- 3L H-Shaped Connector with 4 Pins
+- 28-Tooth Differential
+- 24-Tooth Gear
+- 20-Tooth Gear
+- 12-Tooth Bevel Gear
+- 3L Friction Pin
+- Smooth Pin
+- Friction Pin
+- 15×1 Beam
+- 7×1 Beam
+- Smooth Pin and Axle
+- 1×9 Bent Beam (6-4)
+- Universal Joint
+- 3×1 Beam
+- 2L Pin Connector
+- ¾-Pin Smooth
+- ½-Pin Smooth
+- 43.2 mm Technic Wheel
+- 30 mm Offset Tire
+- 9 Beam
+- 5L Axle
+- 6L Axle
+- 4L Axle with Stop
 
 ---
 
-## What's Next
+# 5. 3D Modelling and Mechanical Design
 
-- [ ] Fix `area` variable bug in `color_detection_v1.py`
-- [ ] Clean up duplicate imports in `open_challenge_v1.py`
-- [ ] Add debounce to direction detection
-- [ ] Find proper HSV values according to the LED lighting present
-- [ ] Wire GPIO stubs to real TB6612 and servo hardware
-- [ ] Test wall-following on a real WRO track and tune `STEERING_GAIN` and `WALL_DARK_THRESHOLD`
-- [ ] Test with second EV3 motor through differential if traction is insufficient
-- [ ] Obstacle Challenge code
-- [ ] Evaluate Ackermann steering upgrade
+We designed the main custom parts of the robot using **3D CAD** and printed them in PLA.
+
+3D printing made it easier to change the design during development. If a part did not fit properly or needed to be changed, we could modify the CAD model and print a new version.
+
+The main design goals were:
+
+- Keep the robot compact
+- Keep the weight distribution close to the centre
+- Provide mounting points for the electronics
+- Protect the electronics
+- Keep the camera stable
+- Keep wires away from moving parts
+- Make parts accessible during testing
+- Integrate the LEGO Technic drivetrain with the printed chassis
+
+## CAD Models
+
+The CAD models are stored in [`models/`](models/).
+
+The folder contains five main models:
+
+- Chassis
+- Circuit box
+- Circuit box lid
+- Camera mount
+- Camera case
+
+### Chassis
+
+The chassis is the main structural part of the robot. It holds the drivetrain, motors, steering mechanism and upper section.
+
+<img src="models/chassis.png" alt="Chassis CAD Model" width="700">
+
+### Circuit Box
+
+The circuit box holds and protects the electronics.
+
+<img src="models/circuit_box.png" alt="Circuit Box CAD Model" width="700">
+
+### Circuit Box Lid
+
+The lid can be removed to access the electronics during testing and maintenance.
+
+<img src="models/circuit_box_lid.png" alt="Circuit Box Lid CAD Model" width="700">
+
+### Camera Mount
+
+The camera mount holds the Raspberry Pi Camera in the required position.
+
+<img src="models/camera_mount.png" alt="Camera Mount CAD Model" width="700">
+
+### Camera Case
+
+The camera case holds and protects the camera board.
+
+<img src="models/camera_case.png" alt="Camera Case CAD Model" width="600">
+
+---
+
+# 6. Mobility Management
+
+## Drivetrain
+
+The robot uses **rear-wheel drive**.
+
+A single geared DC motor drives the rear axle through a LEGO Technic gear train and a **28-tooth differential**.
+
+The differential allows the two rear wheels to rotate at different speeds while turning.
+
+The drivetrain uses a combination of spur and bevel gears to transfer power from the motor to the rear axle.
+
+The final gear ratio is:
+
+**1.8 : 1**
+
+This gives us more torque at the wheels while keeping enough speed for the Open Challenge.
+
+## Steering
+
+The front wheels are controlled using a high-torque digital servo connected to the steering mechanism through LEGO Technic linkages.
+
+The servo is controlled using a **50 Hz PWM signal** from the Raspberry Pi.
+
+We calibrated the steering limits on the physical robot:
+
+| Setting | Value | Meaning |
+|---|---:|---|
+| `CENTER` | 95–98 | Approximately straight |
+| `LEFT` | 70 | Maximum calibrated left turn |
+| `RIGHT` | 125–130 | Maximum calibrated right turn |
+
+The limits were added after the servo was found to occasionally overturn during testing. The software limits prevent it from pushing the steering mechanism too far.
+
+## Wheels
+
+The robot uses **43.2 mm diameter wheels**.
+
+The wheel size was chosen as a compromise between speed, torque, ground clearance and stability.
+
+---
+
+# 7. Power and Electronics
+
+## Power Distribution
+
+| Rail | Source | Used For |
+|---|---|---|
+| **Raw battery voltage** | 3S LiPo | Motor driver and buck converters |
+| **+5 V** | Buck converter | Servo and electronics |
+| **+3.3 V** | Raspberry Pi 5 | OLED and IMU |
+| **GND** | Battery negative | Common ground |
+
+## Raspberry Pi 5 Pin Connections
+
+| Pi Pin | GPIO | Function | Connected To |
+|---|---|---|---|
+| Pin 1 | — | 3.3 V | OLED, IMU |
+| Pin 3 | GPIO2 / SDA | I2C Data | OLED SDA, IMU SDA |
+| Pin 5 | GPIO3 / SCL | I2C Clock | OLED SCL, IMU SCL |
+| Pin 12 | GPIO18 | Digital Input | Push Button |
+| Pin 15 | GPIO22 | PWM | Servo |
+| Pin 16 | GPIO23 | Digital Output | RGB LED Green |
+| Pin 18 | GPIO24 | Digital Output | RGB LED Blue / Motor Driver |
+| Pin 22 | GPIO25 | Digital Output | RGB LED Red / Motor Driver |
+| Pin 31 | GPIO6 | Digital Output | Motor Driver `nSTBY` |
+| Pin 32 | GPIO12 / PWM0 | Digital Output | Programmable LED |
+| Pin 33 | GPIO13 / PWM1 | PWM | Motor Driver |
+| Pins 34, 39 | — | Ground | Common Ground |
+
+## TB6612FNG Motor Driver
+
+| Pin | Connection | Function |
+|---|---|---|
+| `VMOT` | Raw battery voltage | Motor power |
+| `VCC` | +5 V | Logic power |
+| `GND` | Common ground | Ground |
+| `AO1 / BO2` | Motor + | Motor output |
+| `AO2 / BO1` | Motor − | Motor output |
+| `PWMA / PWMB` | GPIO13 | Speed control |
+| `AIN2 / BIN2` | GPIO24 | Direction control |
+| `AIN1 / BIN1` | GPIO22 | Direction control |
+| `nSTBY` | GPIO6 / +5 V | Driver enable |
+
+The two channels of the TB6612FNG are connected in parallel to provide enough current for the drive motor.
+
+## Sensors and Peripherals
+
+| Component | Connection |
+|---|---|
+| OLED | 3.3 V, GND, SDA, SCL |
+| IMU | 3.3 V, GND, SDA, SCL |
+| Servo | GND, +5 V, GPIO22 |
+| Push Button | +5 V / GPIO18 |
+| RGB LED | GPIO23, GPIO24, GPIO25 |
+| Programmable LED | GPIO12 |
+
+## Circuit From Top
+
+This photo shows the electronics and wiring from the top of the robot.
+
+<img src="v-photos/circuit_from_top.png" alt="Circuit From Top" width="700">
+
+# 8. Software Architecture
+
+The software runs on the Raspberry Pi 5 using Python.
+
+The main parts of the software are:
+
+- Camera input
+- Image processing
+- Wall detection
+- Colour detection
+- Direction detection
+- Steering control
+- Line and corner counting
+- Obstacle detection
+- Gyro-based turning
+- Motor control
+
+The software was developed by testing different approaches on the physical robot. When something was not reliable enough, we changed the approach and tested it again.
+
+## Camera Processing
+
+### 1. Frame Capture
+
+The camera captures frames at `1920 × 680`.
+
+### 2. Exposure
+
+At startup, automatic exposure and white balance are allowed to run for approximately two seconds.
+
+The resulting settings are then locked.
+
+This prevents the camera from changing its exposure during the run and affecting colour detection.
+
+### 3. Pre-processing
+
+Each frame is:
+
+1. Gaussian blurred
+2. Converted to LAB colour space
+3. Processed using CLAHE on the lightness channel
+4. Combined again with the A/B channels
+
+### 4. Colour Masks
+
+`cv2.inRange()` is used to detect the required colours.
+
+The masks are then processed using morphological operations before contours are extracted.
+
+---
+
+# 9. Open Challenge
+
+## Initial Navigation
+
+At the start of the run, the robot begins line detection and travels at a slower speed while looking for the first colour marker.
+
+The first colour detected is used to determine the direction of the track.
+
+Our first steering approach was to keep the robot in the centre between the two black walls.
+
+The centre was calculated approximately as `centre = (left_wall + right_wall) / 2`.
+
+The robot then used this centre position to calculate its steering correction.
+
+However, this did not give reliable results.
+
+If one wall was not detected properly, the calculated centre could change significantly, which caused incorrect steering.
+
+## Wall-Following Logic
+
+We changed the navigation system to follow one wall depending on the direction.
+
+### Clockwise
+
+The robot follows the **right wall**.
+
+### Anticlockwise
+
+The robot follows the **left wall**.
+
+This was more reliable because the robot no longer needed both walls to be detected at the same time.
+
+## Meander Turns
+
+During testing, the robot sometimes made unstable turns.
+
+We changed the steering behaviour to make more controlled meander turns instead of making large corrections whenever the detected wall position changed.
+
+## Line and Corner Counting
+
+We keep a cooldown time after detecting a line or corner.
+
+Without the cooldown, the same line could be detected multiple times while it was still visible to the camera.
+
+The line counter therefore works together with the cooldown.
+
+The robot counts **12 corners** during the run.
+
+When the **13th corner** is detected, the robot stops.
+
+## Open Challenge Target
+
+The drivetrain and software were developed around the goal of completing the Open Challenge in approximately **25 seconds**.
+
+The gearing also gives enough torque for lower-speed sections.
+
+---
+
+# 10. Obstacle Challenge
+
+The obstacle challenge required additional logic because the robot starts from the parking area and does not initially have both walls visible.
+
+## Starting Direction
+
+When starting from parking:
+
+- If the robot is travelling anticlockwise, it may not initially see the left wall.
+- If the robot is travelling clockwise, it may not initially see the right wall.
+
+The visible wall can therefore be used to determine the direction:
+
+**Right wall → Clockwise**
+
+**Left wall → Anticlockwise**
+
+## Gyro-Based Starting Turn
+
+A gyro-based turn is used to get the robot out of the parking position and onto the main track.
+
+The gyro measures the robot's rotation so that the turn is not based only on a fixed movement time.
+
+## Initial Obstacle Logic
+
+Our first obstacle logic was:
+
+- **Green obstacle → Turn left**
+- **Red obstacle → Turn right**
+
+This worked in simpler situations, but we had a problem when an obstacle was positioned near a corner.
+
+The robot could turn too early and get stuck around the obstacle.
+
+## Improved Obstacle Logic
+
+We changed the system so that the robot does not immediately make a fixed turn when an obstacle appears.
+
+When an obstacle is detected, the robot first tries to bring the obstacle towards the centre of its body.
+
+Once the obstacle satisfies the minimum distance condition, the robot decides how to move around it.
+
+The process is:
+
+**Detect obstacle → Move obstacle towards robot centre → Check minimum distance → Choose movement direction → Avoid obstacle**
+
+This worked better around corner obstacles.
+
+## Normal Navigation
+
+If no obstacle is detected, the robot uses the same wall-following logic as the Open Challenge.
+
+**Obstacle detected → Obstacle avoidance**
+
+**No obstacle → Normal wall following**
+
+Once the required laps are completed, the robot exits the navigation loop.
+
+---
+
+# 11. Camera Placement
+
+Camera placement was one of the parts of the robot that we changed several times during testing.
+
+## Why the Camera is at the Back
+
+We kept the camera towards the **backside of the robot**.
+
+The reason was mainly related to obstacle detection.
+
+When the robot reaches an obstacle and moves ahead of it, a forward-facing camera can lose sight of the obstacle.
+
+If the obstacle disappears from the camera too early, the robot may make another steering decision. This can cause it to steer back towards the obstacle and potentially knock it over.
+
+Keeping the camera towards the back allows the obstacle to remain visible for longer while the robot moves past it.
+
+## Camera Height
+
+We initially kept the camera lower.
+
+The lower position allowed the robot to make judgements faster because the relevant part of the track was closer to the camera.
+
+We then adjusted the position based on the wall and obstacle detection results.
+
+## Camera Angle
+
+We tested multiple camera angles.
+
+At some of the earlier angles, wall detection became unstable around corners.
+
+At one point, an incorrect camera angle caused the robot to move in the wrong direction.
+
+Because of this, the final camera position was chosen through physical testing rather than only from the CAD model.
+
+---
+
+# 12. Failure Cases
+
+A lot of the development involved dealing with hardware failures and unexpected behaviour.
+
+## Battery Failure
+
+The battery exploded while it was being charged.
+
+This was one of the major hardware failures during development and made us more careful about LiPo charging and handling.
+
+## USB Buck Converter
+
+The original USB buck converter was rated at `5 V / 3 A`.
+
+The Raspberry Pi was not getting enough current from it.
+
+We changed the converter because the Raspberry Pi requires a higher current supply under load.
+
+## Motor Stalling
+
+Stalling occurs when you prevent the motor from moving even though the power is still on.
+
+This can cause the motor to draw more current than the motor driver can provide.
+
+This can lead to the motor driver overheating, getting damaged or stopping completely.
+
+We therefore had to take motor stalling into account during testing.
+
+## Servo Overturning
+
+The steering servo sometimes overturned for reasons we were not able to identify.
+
+To prevent this from damaging the steering mechanism, we added software safety limits.
+
+The calibrated limits are:
+
+- `LEFT = 70`
+- `CENTER = 95–98`
+- `RIGHT = 125–130`
+
+The servo cannot move outside these calibrated values.
+
+---
+
+# 13. Future Enhancements
+
+The main feature we still plan to add is automated parking.
+
+The planned sequence after completing the three laps is:
+
+1. Complete three laps
+2. Move to the corner section
+3. Perform a U-turn
+4. Follow the outer wall
+5. Detect the magnets
+6. Stop at a fixed position
+7. Perform a gyro-based turn
+
+The aim is to make the final parking position consistent rather than relying only on timed movement.
+
+---
+
+# 14. Repository Structure
+
+The repository is organised into the robot's source code, photographs and CAD models.
+
+- `src/` — Robot software
+- `v-photos/` — Robot photographs and videos
+- `models/` — 3D models of the custom parts
+
+The `models/` folder contains:
+
+- `chassis`
+- `circuit_box`
+- `circuit_box_lid`
+- `camera_mount`
+- `camera_case`
+
+---
+
+## Conclusion
+
+The Dark Knight was developed through repeated testing of both the hardware and software.
+
+Our first wall-following approach used the centre between the two black walls, but it was not reliable enough. We changed this to direction-based wall following, where the robot follows the right wall when going clockwise and the left wall when going anticlockwise.
+
+We also changed the camera position and angle after finding problems with wall detection and obstacle detection. The obstacle logic was changed after the robot got stuck near a corner obstacle.
+
+On the hardware side, we changed the USB buck converter after the Raspberry Pi was not receiving enough current, added steering safety limits after the servo overturned, and took motor stalling into account when testing the drivetrain.
+
+The final robot combines a Raspberry Pi 5, camera-based vision, LEGO Technic drivetrain components, 3D-printed parts, servo steering, a differential drive, gyro-based turning and colour-based detection.
