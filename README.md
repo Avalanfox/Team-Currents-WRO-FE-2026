@@ -47,7 +47,7 @@ The main computer is a **Raspberry Pi 5 (4 GB)**. A Raspberry Pi Camera is used 
 
 The robot uses a LEGO Technic drivetrain with a differential. The chassis and several other parts were designed in CAD and 3D printed in PLA.
 
-During development, we changed both the mechanical design and the software several times. Most of these changes came from problems we found while testing the robot on the actual track, especially with wall detection, camera placement, obstacle detection and steering.
+During development, we changed both the mechanical design and the software several times. These changes were based on problems and performance observations from testing the robot, including drivetrain speed, steering behaviour, wall detection, camera placement, obstacle detection and lighting conditions.
 
 ## Robot Photos
 
@@ -100,19 +100,36 @@ The weight distribution is approximately centred. This helped keep the robot sta
 
 ## Motor and Torque
 
-Torque was important because we needed the robot to be fast enough for the Open Challenge while still having enough torque for slower movements and parking.
+The drivetrain was developed by considering the balance between available torque and robot speed.
 
-### Motor
+The initial drivetrain configuration provided more torque than was necessary for the robot's mass and operating conditions. Since the WRO Future Engineers track requires the robot to travel quickly, we decided to trade some available torque for higher wheel speed.
+
+### Initial Drivetrain Configuration
 
 - **Stall torque:** 0.60 kg
-- **Gear ratio:** 1.8 : 1
+- **Rated torque:** 0.15 kg
 
-### Drive Output
+### Final Drivetrain Configuration
 
-- **Stall torque:** 0.97 kg
-- **Rated torque:** 0.24 kg
+After changing the gear ratio to the final configuration:
 
-The 1.8:1 gear ratio gives us more torque at the drive while reducing the output speed. This was useful for reaching the **25-second Open Challenge goal** while still having enough torque for low-speed movement.
+- **Stall torque:** 0.33 kg
+- **Rated torque:** 0.083 kg
+
+The reduction in available torque was acceptable because the robot did not require the higher torque capacity of the original configuration. The priority was to make better use of the 600 RPM motor's available speed.
+
+The final drivetrain was therefore selected as a speed-oriented configuration while retaining sufficient torque for the robot's required movement.
+
+### Engineering Trade-off
+
+| Configuration | Stall Torque | Rated Torque | Development Focus |
+|---|---:|---:|---|
+| Initial | 0.60 kg | 0.15 kg | Higher torque capacity |
+| Final | 0.33 kg | 0.083 kg | Higher speed |
+
+The final configuration was validated through physical testing. The robot travelled **3 metres in 2.25 seconds**, giving a measured speed of approximately **1.33 m/s (4.8 km/h)**.
+
+This showed that the final drivetrain provided sufficient performance for the robot while prioritising the speed required for the WRO track.
 
 ---
 
@@ -253,7 +270,11 @@ The final gear ratio is:
 
 **1.8 : 1**
 
-This gives us more torque at the wheels while keeping enough speed for the Open Challenge.
+The gear ratio was selected to prioritise robot speed rather than maximum available torque. During development, we found that the original torque capacity was more than required for the robot's mass and operating conditions.
+
+We therefore changed the gear ratio to make better use of the 600 RPM motor's available speed. This reduced the documented drivetrain torque from 0.60 kg stall / 0.15 kg rated to 0.33 kg stall / 0.083 kg rated.
+
+The reduction in torque was acceptable because the robot still had sufficient drive performance for the track. The final configuration was validated through a 3 m speed test, where the robot completed the distance in 2.25 seconds.
 
 ## Steering
 
@@ -276,6 +297,29 @@ The limits were added after the servo was found to occasionally overturn during 
 The robot uses **43.2 mm diameter wheels**.
 
 The wheel size was chosen as a compromise between speed, torque, ground clearance and stability.
+
+## Drivetrain Testing
+
+The final drivetrain was tested on the physical robot to verify that the speed-oriented gear ratio still provided sufficient drive performance.
+
+### Speed Test
+
+| Parameter | Result |
+|---|---:|
+| Test distance | 3 m |
+| Test time | 2.25 s |
+| Measured speed | 1.33 m/s |
+| Equivalent speed | 4.8 km/h |
+
+The robot was also tested over 10 runs:
+
+- **Successful runs:** 8
+- **Failed runs:** 2
+- **Overall success rate:** 80%
+
+The main causes of failure were related to vision detection and lighting conditions rather than insufficient drivetrain torque.
+
+This testing helped confirm that reducing the available drivetrain torque was acceptable for the final robot because the robot achieved the required movement speed while maintaining sufficient drive performance.
 
 ---
 
@@ -450,7 +494,7 @@ When the **13th corner** is detected, the robot stops.
 
 The drivetrain and software were developed around the goal of completing the Open Challenge in approximately **25 seconds**.
 
-The gearing also gives enough torque for lower-speed sections.
+The final gearing was selected as a speed-oriented compromise. Testing showed that the remaining available torque was sufficient for the robot's required movements while providing the higher speed needed for the track.
 
 ---
 
