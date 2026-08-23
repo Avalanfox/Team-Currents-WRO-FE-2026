@@ -9,28 +9,28 @@ The purpose of this README is to make the repository easy to audit against the e
 
 ## Table of Contents
 
-- [Robot and CAD Visual Reference](#robot-and-cad-visual-reference)
 - [1. Team](#1-team)
 - [2. Final Robot Overview](#2-final-robot-overview)
-- [3. Final Robot Specifications](#3-final-robot-specifications)
-- [4. Mechanical Design](#4-mechanical-design)
-- [5. Cameras and Perception](#5-cameras-and-perception)
-- [6. Computer Vision](#6-computer-vision)
-- [7. Steering](#7-steering)
-- [8. Software Architecture](#8-software-architecture)
-- [9. Open Challenge](#9-open-challenge)
-- [10. Obstacle Challenge](#10-obstacle-challenge)
-- [11. Parking and MPU6050](#11-parking-and-mpu6050)
-- [12. Power Architecture](#12-power-architecture)
-- [13. Measured Power Results](#13-measured-power-results)
-- [14. Engineering Evolution](#14-engineering-evolution)
-- [15. Recorded Challenge Performance](#15-recorded-challenge-performance)
-- [16. Known Development History](#16-known-development-history)
-- [17. Repository Structure](#17-repository-structure)
-- [18. Reproducibility](#18-reproducibility)
-- [19. Evidence Included in This Repository](#19-evidence-included-in-this-repository)
-- [20. Final Nationals Checklist](#20-final-nationals-checklist)
-- [21. Version](#21-version)
+- [3. Robot and CAD Visual Reference](#3-robot-and-cad-visual-reference)
+- [4. Final Robot Specifications](#4-final-robot-specifications)
+- [5. Mechanical Design](#5-mechanical-design)
+- [6. Cameras and Perception](#6-cameras-and-perception)
+- [7. Computer Vision](#7-computer-vision)
+- [8. Steering](#8-steering)
+- [9. Software Architecture](#9-software-architecture)
+- [10. Open Challenge](#10-open-challenge)
+- [11. Obstacle Challenge](#11-obstacle-challenge)
+- [12. Parking and MPU6050](#12-parking-and-mpu6050)
+- [13. Power Architecture](#13-power-architecture)
+- [14. Measured Power Results](#14-measured-power-results)
+- [15. Engineering Evolution](#15-engineering-evolution)
+- [16. Recorded Challenge Performance](#16-recorded-challenge-performance)
+- [17. Known Development History](#17-known-development-history)
+- [18. Repository Structure](#18-repository-structure)
+- [19. Reproducibility](#19-reproducibility)
+- [20. Evidence Included in This Repository](#20-evidence-included-in-this-repository)
+- [21. Final Nationals Configuration Verification](#21-final-nationals-configuration-verification)
+- [22. Version](#22-version)
 
 ---
 
@@ -78,7 +78,7 @@ The project evolved through physical testing rather than being designed complete
 
 ---
 
-# Robot and CAD Visual Reference
+# 3. Robot and CAD Visual Reference
 
 The visual assets below are stored in the repository using the same vehicle-photo convention as the original GitHub README: `v-photos/`. CAD preview images are in `models/`, and the final schematic preview is in `schemes/`.
 
@@ -145,7 +145,7 @@ The visual assets below are stored in the repository using the same vehicle-phot
 
 <img src="./schemes/schematic.png" alt="Final circuit schematic" width="1000">
 
-# 3. Final Robot Specifications
+# 4. Final Robot Specifications
 
 | Specification | Final documented value |
 |---|---:|
@@ -168,7 +168,7 @@ The final documentation explains that the drivetrain changed to four-wheel drive
 
 ---
 
-# 4. Mechanical Design
+# 5. Mechanical Design
 
 ## 4.1 CAD + LEGO hybrid architecture
 
@@ -219,7 +219,7 @@ The final documented speed test was:
 
 ---
 
-# 5. Cameras and Perception
+# 6. Cameras and Perception
 
 The final robot uses **two Raspberry Pi Camera Module 3 cameras**.
 
@@ -255,7 +255,7 @@ The two-camera arrangement was selected so the robot could maintain forward perc
 
 ---
 
-# 6. Computer Vision
+# 7. Computer Vision
 
 The software uses **OpenCV** and both **HSV and LAB** colour representations.
 
@@ -292,7 +292,7 @@ The exact colour thresholds are calibration values in `code/vision.py`. They sho
 
 ---
 
-# 7. Steering
+# 8. Steering
 
 The actual software configuration in `code/config.py` and `code/drive.py` uses:
 
@@ -310,7 +310,7 @@ These are the final documented/calibrated values. Older repository descriptions 
 
 ---
 
-# 8. Software Architecture
+# 9. Software Architecture
 
 The software runs in Python on the Raspberry Pi 5.
 
@@ -340,7 +340,7 @@ Important safety behaviour in the current source includes:
 
 ---
 
-# 9. Open Challenge
+# 10. Open Challenge
 
 ## 9.1 Navigation
 
@@ -397,7 +397,7 @@ The final engineering document correctly treats these as the team's recorded tes
 
 ---
 
-# 10. Obstacle Challenge
+# 11. Obstacle Challenge
 
 The obstacle controller gives obstacle detections priority over normal wall following.
 
@@ -427,7 +427,7 @@ Parking is **not listed as a future/unimplemented feature**. The final document 
 
 ---
 
-# 11. Parking and MPU6050
+# 12. Parking and MPU6050
 
 Parking uses the **rear camera + explicit state logic + MPU6050 heading feedback**.
 
@@ -458,7 +458,7 @@ It should not be described anywhere in the Nationals repository as merely "plann
 
 ---
 
-# 12. Power Architecture
+# 13. Power Architecture
 
 The final system uses a **3S 2200 mAh LiPo** with separate regulated branches.
 
@@ -488,7 +488,7 @@ All branches share a common ground.
 
 ---
 
-# 13. Measured Power Results
+# 14. Measured Power Results
 
 Only physically documented voltage measurements are included here.
 
@@ -511,7 +511,7 @@ The final documentation also notes that these multimeter measurements do not cha
 
 ---
 
-# 14. Engineering Evolution
+# 15. Engineering Evolution
 
 The project followed a repeated:
 
@@ -534,7 +534,7 @@ process.
 
 ---
 
-# 15. Recorded Challenge Performance
+# 16. Recorded Challenge Performance
 
 ## Open Challenge
 
@@ -566,7 +566,7 @@ The obstacle runs were not identical trials because obstacle placement varied sl
 
 ---
 
-# 16. Known Development History
+# 17. Known Development History
 
 Some values appearing in older repository files are development/prototype information, not the final Nationals configuration.
 
@@ -586,7 +586,7 @@ The older prototype information should not be presented as the final configurati
 
 ---
 
-# 17. Repository Structure
+# 18. Repository Structure
 
 ```text
 Team_Currents_Nationals_v1.0/
@@ -642,7 +642,7 @@ The repository structure is intentionally separated into code, CAD, schematics, 
 
 ---
 
-# 18. Reproducibility
+# 19. Reproducibility
 
 A person reproducing the documented system would need, at minimum:
 
@@ -670,7 +670,7 @@ The exact source implementation is in `code/`.
 
 ---
 
-# 19. Evidence Included in This Repository
+# 20. Evidence Included in This Repository
 
 The current package includes:
 
@@ -688,7 +688,7 @@ Native editable CAD/schematic source files should only be added if the team actu
 
 ---
 
-# 20. Final Nationals Configuration Verification
+# 21. Final Nationals Configuration Verification
 
 The repository-side consistency check has been completed against the final engineering document, the supplied testing evidence, and the current source tree. This section records the completed state rather than a list of unfinished tasks.
 
@@ -723,7 +723,7 @@ No unmeasured current value has been added. No missing native CAD or schematic s
 
 ---
 
-# 21. Version
+# 22. Version
 
 **v1.0 — Nationals Configuration**
 
