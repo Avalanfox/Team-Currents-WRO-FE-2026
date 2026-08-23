@@ -9,23 +9,28 @@ The purpose of this README is to make the repository easy to audit against the e
 
 ## Table of Contents
 
-1. [Team](#1-team)
-2. [Final Robot Overview](#2-final-robot-overview)
-3. [Final Robot Specifications](#3-final-robot-specifications)
-4. [Mechanical Design](#4-mechanical-design)
-5. [Cameras and Perception](#5-cameras-and-perception)
-6. [Computer Vision](#6-computer-vision)
-7. [Steering](#7-steering)
-8. [Software Architecture](#8-software-architecture)
-9. [Open Challenge](#9-open-challenge)
-10. [Obstacle Challenge](#10-obstacle-challenge)
-11. [Parking and IMU](#11-parking-and-imu)
-12. [Power and Electronics](#12-power-and-electronics)
-13. [Testing Results](#13-testing-results)
-14. [Engineering Evolution](#14-engineering-evolution)
-15. [Failure Cases and Risk](#15-failure-cases-and-risk)
-16. [Repository Structure](#16-repository-structure)
-17. [Reproducibility](#17-reproducibility)
+- [Robot and CAD Visual Reference](#robot-and-cad-visual-reference)
+- [1. Team](#1-team)
+- [2. Final Robot Overview](#2-final-robot-overview)
+- [3. Final Robot Specifications](#3-final-robot-specifications)
+- [4. Mechanical Design](#4-mechanical-design)
+- [5. Cameras and Perception](#5-cameras-and-perception)
+- [6. Computer Vision](#6-computer-vision)
+- [7. Steering](#7-steering)
+- [8. Software Architecture](#8-software-architecture)
+- [9. Open Challenge](#9-open-challenge)
+- [10. Obstacle Challenge](#10-obstacle-challenge)
+- [11. Parking and MPU6050](#11-parking-and-mpu6050)
+- [12. Power Architecture](#12-power-architecture)
+- [13. Measured Power Results](#13-measured-power-results)
+- [14. Engineering Evolution](#14-engineering-evolution)
+- [15. Recorded Challenge Performance](#15-recorded-challenge-performance)
+- [16. Known Development History](#16-known-development-history)
+- [17. Repository Structure](#17-repository-structure)
+- [18. Reproducibility](#18-reproducibility)
+- [19. Evidence Included in This Repository](#19-evidence-included-in-this-repository)
+- [20. Final Nationals Checklist](#20-final-nationals-checklist)
+- [21. Version](#21-version)
 
 ---
 
@@ -75,65 +80,70 @@ The project evolved through physical testing rather than being designed complete
 
 # Robot and CAD Visual Reference
 
-The README keeps the visual documentation directly beside the engineering description. The images below are the visual assets available from the final engineering-document package and are named to match the original README's intended image sections.
+The visual assets below are stored in the repository using the same vehicle-photo convention as the original GitHub README: `v-photos/`. CAD preview images are in `models/`, and the final schematic preview is in `schemes/`.
 
 ## Robot Photos
 
 ### Front View
 
-<img src="photos/front_view.png" alt="Robot front view" width="600">
+<img src="./v-photos/front_view.png" alt="The Dark Knight front view" width="600">
 
 ### Back View
 
-<img src="photos/back_view.png" alt="Robot back view" width="600">
+<img src="./v-photos/back_view.png" alt="The Dark Knight back view" width="600">
 
 ### Side Views
 
 <p align="center">
-  <img src="photos/side_view_1.png" alt="Robot side view 1" width="45%">
-  <img src="photos/side_view_2.png" alt="Robot side view 2" width="45%">
+  <img src="./v-photos/side_view_1.png" alt="The Dark Knight side view 1" width="45%">
+  <img src="./v-photos/side_view_2.png" alt="The Dark Knight side view 2" width="45%">
 </p>
 
 ### Motor and Steering
 
 <p align="center">
-  <img src="photos/motor_close_up.png" alt="Drive motor close-up" width="45%">
-  <img src="photos/servo_close_up.png" alt="Steering servo close-up" width="45%">
+  <img src="./v-photos/motor_close_up.png" alt="JGB37-520 drive motor" width="45%">
+  <img src="./v-photos/servo_close_up.png" alt="Steering servo" width="45%">
 </p>
 
 ### Differential and Electronics
 
 <p align="center">
-  <img src="photos/differential.png" alt="Mechanical differential" width="45%">
-  <img src="photos/circuit_case_and_battery.png" alt="Electronics and battery" width="45%">
+  <img src="./v-photos/differential.png" alt="Mechanical LEGO differential" width="45%">
+  <img src="./v-photos/circuit_case_and_battery.png" alt="Electronics and battery" width="45%">
+</p>
+
+### Electronics From Above
+
+<p align="center">
+  <img src="./v-photos/circuit_from_top.png" alt="Electronics from top" width="700">
 </p>
 
 ## CAD Models
 
-### Chassis
+### Final Chassis
 
-<img src="cad/chassis.png" alt="Final CAD chassis" width="700">
+<img src="./models/chassis.png" alt="Final CAD chassis" width="700">
 
 ### Circuit Box
 
-<img src="cad/circuit_box.png" alt="Circuit box CAD" width="700">
+<img src="./models/circuit_box.png" alt="Circuit box CAD" width="700">
 
 ### Circuit Box Lid
 
-<img src="cad/circuit_box_lid.png" alt="Circuit box lid CAD" width="700">
+<img src="./models/circuit_box_lid.png" alt="Circuit box lid CAD" width="700">
 
 ### Camera Mount
 
-<img src="cad/camera_mount.png" alt="Camera mount CAD" width="700">
+<img src="./models/camera_mount.png" alt="Dual-camera mounting component" width="700">
 
 ### Camera Case
 
-<img src="cad/camera_case.png" alt="Camera case CAD" width="600">
+<img src="./models/camera_case.png" alt="Camera case CAD" width="600">
 
 ## Circuit Schematic
 
-<img src="schematics/schematic.png" alt="Final circuit schematic" width="1000">
-
+<img src="./schemes/schematic.png" alt="Final circuit schematic" width="1000">
 
 # 3. Final Robot Specifications
 
@@ -602,11 +612,20 @@ Team_Currents_Nationals_v1.0/
 │   ├── final STL exports
 │   └── CAD reference images
 │
+├── models/
+│   └── README-compatible CAD preview images
+│
 ├── schematics/
 │   └── final schematic reference
 │
+├── schemes/
+│   └── README-compatible schematic preview
+│
 ├── photos/
-│   └── original robot/development photographs
+│   └── source robot/development photographs
+│
+├── v-photos/
+│   └── README-compatible vehicle photographs
 │
 ├── testing/
 │   ├── Open_Challenge.mp4
