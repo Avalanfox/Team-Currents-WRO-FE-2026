@@ -6,6 +6,29 @@ This repository contains the current Nationals configuration of **The Dark Knigh
 
 The purpose of this README is to make the repository easy to audit against the engineering documentation, source code, CAD, schematic and recorded testing evidence.
 
+
+## Table of Contents
+
+1. [Team](#1-team)
+2. [Final Robot Overview](#2-final-robot-overview)
+3. [Final Robot Specifications](#3-final-robot-specifications)
+4. [Mechanical Design](#4-mechanical-design)
+5. [Cameras and Perception](#5-cameras-and-perception)
+6. [Computer Vision](#6-computer-vision)
+7. [Steering](#7-steering)
+8. [Software Architecture](#8-software-architecture)
+9. [Open Challenge](#9-open-challenge)
+10. [Obstacle Challenge](#10-obstacle-challenge)
+11. [Parking and IMU](#11-parking-and-imu)
+12. [Power and Electronics](#12-power-and-electronics)
+13. [Testing Results](#13-testing-results)
+14. [Engineering Evolution](#14-engineering-evolution)
+15. [Failure Cases and Risk](#15-failure-cases-and-risk)
+16. [Repository Structure](#16-repository-structure)
+17. [Reproducibility](#17-reproducibility)
+
+---
+
 > **Consistency rule:** The final engineering document is the reference for the documented physical design and measured results. The Python source in `code/` is the reference for the actual software implementation. If a value is not measured or cannot be confirmed from the supplied material, it is explicitly marked as not measured / not confirmed rather than invented.
 
 ---
@@ -45,6 +68,72 @@ The final architecture combines:
 The project evolved through physical testing rather than being designed completely on paper. Major iterations involved the drivetrain, chassis, camera arrangement, power distribution, computer vision, navigation, obstacle avoidance and parking.
 
 ---
+
+
+
+---
+
+# Robot and CAD Visual Reference
+
+The README keeps the visual documentation directly beside the engineering description. The images below are the visual assets available from the final engineering-document package and are named to match the original README's intended image sections.
+
+## Robot Photos
+
+### Front View
+
+<img src="photos/front_view.png" alt="Robot front view" width="600">
+
+### Back View
+
+<img src="photos/back_view.png" alt="Robot back view" width="600">
+
+### Side Views
+
+<p align="center">
+  <img src="photos/side_view_1.png" alt="Robot side view 1" width="45%">
+  <img src="photos/side_view_2.png" alt="Robot side view 2" width="45%">
+</p>
+
+### Motor and Steering
+
+<p align="center">
+  <img src="photos/motor_close_up.png" alt="Drive motor close-up" width="45%">
+  <img src="photos/servo_close_up.png" alt="Steering servo close-up" width="45%">
+</p>
+
+### Differential and Electronics
+
+<p align="center">
+  <img src="photos/differential.png" alt="Mechanical differential" width="45%">
+  <img src="photos/circuit_case_and_battery.png" alt="Electronics and battery" width="45%">
+</p>
+
+## CAD Models
+
+### Chassis
+
+<img src="cad/chassis.png" alt="Final CAD chassis" width="700">
+
+### Circuit Box
+
+<img src="cad/circuit_box.png" alt="Circuit box CAD" width="700">
+
+### Circuit Box Lid
+
+<img src="cad/circuit_box_lid.png" alt="Circuit box lid CAD" width="700">
+
+### Camera Mount
+
+<img src="cad/camera_mount.png" alt="Camera mount CAD" width="700">
+
+### Camera Case
+
+<img src="cad/camera_case.png" alt="Camera case CAD" width="600">
+
+## Circuit Schematic
+
+<img src="schematics/schematic.png" alt="Final circuit schematic" width="1000">
+
 
 # 3. Final Robot Specifications
 
@@ -634,6 +723,3 @@ The goal of this repository is not to make the robot look more advanced than it 
 It is to make the **code, hardware, CAD, testing evidence and engineering documentation tell the same story**.
 
 If something was not measured, it is not presented as measured. If something was only a prototype, it is not presented as the final configuration. If a value changes in the physical robot, the code and documentation should be updated together.
- stalling into account when testing the drivetrain.
-
-The final robot combines a Raspberry Pi 5, camera-based vision, LEGO Technic drivetrain components, 3D-printed parts, servo steering, a differential drive, gyro-based turning and colour-based detection.
