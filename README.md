@@ -1,4 +1,4 @@
-# The Dark Knight
+<img width="1569" height="468" alt="image" src="https://github.com/user-attachments/assets/c18f4c5c-15b8-42a9-85a3-3fc9fa129717" /># The Dark Knight
 
 ### WRO Future Engineers 2026 — Engineering Documentation
 
@@ -420,9 +420,9 @@ The power system was tested on the physical robot to check the battery-side elec
 
 | Operating Condition | Battery Voltage | Battery Current | Approx. Power |
 |---|---:|---:|---:|
-| Robot idle | TBD | TBD | TBD |
-| Normal driving | TBD | TBD | TBD |
-| Turning / servo movement | TBD | TBD | TBD |
+| Robot idle | 11.1V | TBD | TBD |
+| Normal driving | 10.8V | TBD | TBD |
+| Turning / servo movement | 10.8V | TBD | TBD |
 
 These measurements will be used to compare the actual robot power demand with the capabilities of the battery, buck converters and motor driver.
 
