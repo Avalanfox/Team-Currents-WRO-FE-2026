@@ -12,6 +12,7 @@ The purpose of this README is to make the repository easy to audit against the e
 - [1. Team](#1-team)
 - [2. Final Robot Overview](#2-final-robot-overview)
 - [3. Robot and CAD Visual Reference](#3-robot-and-cad-visual-reference)
+  - [Final STL Files](#final-stl-files)
 - [4. Final Robot Specifications](#4-final-robot-specifications)
 - [5. Mechanical Design](#5-mechanical-design)
 - [6. Cameras and Perception](#6-cameras-and-perception)
@@ -144,6 +145,24 @@ The visual assets below are stored in the repository using the same vehicle-phot
 ## Circuit Schematic
 
 <img src="./schemes/schematic.png" alt="Final circuit schematic" width="1000">
+
+
+## Final STL Files
+
+The final CAD source files supplied for the Nationals configuration are stored in [`cad/`](./cad/). The STL files are included as downloadable manufacturing files rather than embedded directly in the README, because GitHub does not reliably render STL geometry inline inside a Markdown page.
+
+### Final supplied STL models
+
+| Model | STL file | Purpose |
+|---|---|---|
+| Final chassis | [`currents final chassis.stl`](./cad/currents%20final%20chassis.stl) | Main custom chassis |
+| Final chassis — Part 2 | [`currents final chassis pt2.stl`](./cad/currents%20final%20chassis%20pt2.stl) | Additional chassis component |
+| Dual-camera mount | [`currnts dual camera mount.stl`](./cad/currnts%20dual%20camera%20mount.stl) | Camera mounting component |
+| Camera case | [`camera case (1).stl`](./cad/camera%20case%20%281%29.stl) | Camera protection/enclosure |
+| Circuit box | [`currents CB.stl`](./cad/currents%20CB.stl) | Electronics enclosure |
+| Circuit box lid | [`currents CB LID.stl`](./cad/currents%20CB%20LID.stl) | Electronics enclosure lid |
+
+These are the STL files supplied by the team for the final repository package. The corresponding CAD preview images remain in [`models/`](./models/) and the STL files themselves remain in [`cad/`](./cad/).
 
 # 4. Final Robot Specifications
 
