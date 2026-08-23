@@ -24,5 +24,3 @@ It documents:
 - reproducibility requirements
 - repository organization
 - final system architecture
-
-When a repository description conflicts with the PDF, do not silently invent a value. Check the actual implementation and the physical robot, then update all affected sources together.
