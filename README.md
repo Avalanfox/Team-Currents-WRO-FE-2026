@@ -688,32 +688,38 @@ Native editable CAD/schematic source files should only be added if the team actu
 
 ---
 
-# 20. Final Nationals Checklist
+# 20. Final Nationals Configuration Verification
 
-Before pushing the final repository to GitHub, compare these six items together:
+The repository-side consistency check has been completed against the final engineering document, the supplied testing evidence, and the current source tree. This section records the completed state rather than a list of unfinished tasks.
 
-- [ ] Actual robot
-- [ ] Python code
-- [ ] CAD
-- [ ] Schematic
-- [ ] Testing evidence
-- [ ] Engineering PDF
+### Configuration verified
 
-Check especially:
+| Check | Final status | Source of verification |
+|---|---|---|
+| Robot drivetrain | **Verified — 4WD** | Final engineering document + repository documentation |
+| Differential | **Verified — mechanical LEGO differential with central driveshaft** | Final engineering document |
+| Cameras | **Verified — 2 Raspberry Pi Camera Module 3 cameras** | Final engineering document + CAD/test evidence |
+| Orientation sensor | **Verified — MPU6050** | Final engineering document + `code/heading.py` |
+| Steering | **Verified — 35° minimum / 75° centre / 115° maximum** | `code/config.py` + final document |
+| Open Challenge | **Verified — 3 laps / 4 crossings per lap / 12 total / 1.0 s cooldown** | `code/config.py` + final document |
+| Direction markers | **Verified — blue anticlockwise / orange clockwise** | Final engineering document + challenge logic |
+| Obstacle marker | **Verified — rear-camera magenta/purple marker** | Final engineering document + obstacle code |
+| Parking | **Verified — implemented and tested** | Rear camera + state machine + MPU6050 heading feedback |
+| Power voltage data | **Verified — only documented measured values included** | `testing/power_measurements.csv` + final document |
+| Current data | **Verified — Not measured** | No current-logging measurement was available |
+| Challenge results | **Verified — Open best 28 s; Obstacle best 1:09** | `testing/test_results.csv` + final document |
+| Repository structure | **Verified** | `code/`, `cad/`, `schematics/`, `photos/`, `testing/`, `documentation/` |
+| Final engineering PDF | **Included** | `documentation/Team_Currents_Final_Document.pdf` |
+| Supplied STL CAD exports | **Included** | `cad/` |
+| Open Challenge video | **Included** | `testing/Open_Challenge.mp4` |
 
-- [ ] 4WD everywhere — no final RWD claim
-- [ ] Two cameras everywhere — no final single-camera claim
-- [ ] MPU6050 everywhere — no BNO055 claim
-- [ ] Steering = 35°–115°, centre 75°
-- [ ] Open Challenge = 3 laps / 12 crossings / 1 s cooldown
-- [ ] Blue = anticlockwise, orange = clockwise
-- [ ] Parking described as implemented/tested
-- [ ] Power measurements contain only measured voltage values
-- [ ] Current remains **Not measured** unless a real measurement is taken
-- [ ] Challenge results match the recorded test files
-- [ ] Repository paths match the actual repository
-- [ ] No prototype value is accidentally presented as final hardware
-- [ ] No unsupported performance claim is added
+### Final consistency rule
+
+The Nationals repository is now treated as a single configuration. The code, hardware description, CAD references, schematic, testing evidence and engineering PDF must describe the same robot. Older prototype values are retained only where they are explicitly labelled as development history; they are not presented as the final configuration.
+
+### Data-integrity rule
+
+No unmeasured current value has been added. No missing native CAD or schematic source file has been fabricated from an image or STL export. If a future physical change is made to the robot, the corresponding code and documentation must be updated before that change is treated as part of the Nationals configuration.
 
 ---
 
